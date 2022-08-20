@@ -1,0 +1,45 @@
+name: Build sillyGirl
+
+on: 
+  release:
+    types: [published]
+  push:
+    tags:
+    - 'v*'
+  #  branches: 
+  #    - master
+#  schedule:
+#    - cron: 0 8 * * 5
+  watch:
+    types: [started]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17
+
+    - name: Clone source code
+      run: |
+        git clone --depth=1 https://github.com/84896150/sillyGirl-Old.git /home/runner/go/src/github.com/cdle/sillyGirl
+        pwd
+    - name: go build
+      run: |
+        cp $GITHUB_WORKSPACE/dev.go /home/runner/go/src/github.com/cdle/sillyGirl/
+        cd /home/runner/go/src/github.com/cdle/sillyGirl
+        GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o sillyGirl
+        mkdir -p /opt/images
+        sudo mv -f sillyGirl /opt/images/
+        
+    - name : Upload packages
+      uses: actions/upload-artifact@master
+      if: always()
+      with:
+        name: sillyGirl-packages
+        path: /opt/images/
