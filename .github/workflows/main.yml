@@ -37,9 +37,18 @@ jobs:
         mkdir -p /opt/images
         sudo mv -f sillyGirl /opt/images/
         
-    - name : Upload packages
-      uses: actions/upload-artifact@master
-      if: always()
+#     - name : Upload packages
+#       uses: actions/upload-artifact@master
+#       if: always()
+#       with:
+#         name: sillyGirl-packages
+#         path: /opt/images/
+
+    - name: Upload to release
+      uses: svenstaro/upload-release-action@v2
       with:
-        name: sillyGirl-packages
-        path: /opt/images/
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: sillyGirl_linux_amd64
+        asset_name: sillyGirl_linux_amd64
+        tag: ${{ github.ref }}
+        overwrite: true
